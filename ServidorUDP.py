@@ -12,10 +12,15 @@ def calcRaiz(a):
 def operCalc(operacao):
     lOperacao = operacao.split()
     if lOperacao[0].upper() == 'SOMA':
-        if lOperacao[1].isnumeric() and lOperacao[2].isnumeric():
-            return calcSoma(lOperacao[1], lOperacao[2])
+        if len(lOperacao) == 3:
+            if lOperacao[1].isnumeric() and lOperacao[2].isnumeric():
+                print(len(lOperacao))
+                return calcSoma(lOperacao[1], lOperacao[2])
+            else:
+                sErro = 'Os valores passados não são numéricos.'
+                return sErro
         else:
-            sErro = 'Os valores passados não são numéricos.'
+            sErro = 'Não há parâmetros suficiente para realizar a operação \'soma\'.'
             return sErro
     elif lOperacao[0].upper() == 'RAIZ':
         if lOperacao[1].isnumeric():
@@ -38,14 +43,19 @@ serverSocket.bind((serverHost, serverPort))
 print("Servidor Iniciado.")
 
 while True:
-    strComandos, clientAddress = serverSocket.recvfrom(2048)
-    print('Conexão iniciada por: ', clientAddress)
-    lComandos = strComandos.decode('utf-8').rstrip('\n').split('\n')
-    result = ''
-    print(lComandos)
-    for comOper in lComandos:
-        result += 'Comando \'' + comOper + '\' Resultado: ' + operCalc(comOper) + '\n'
-    print(result)
-    serverSocket.sendto(result.encode(), clientAddress)
-    serverSocket.close()
-    break
+    try:
+        strComandos, clientAddress = serverSocket.recvfrom(2048)
+        print('Conexão iniciada por: ', clientAddress)
+        lComandos = strComandos.decode('utf-8').rstrip('\n').split('\n')
+        result = ''
+        print(lComandos)
+        for comOper in lComandos:
+            result += 'Comando \'' + comOper + '\' Resultado: ' + operCalc(comOper) + '\n'
+        print(result)
+        serverSocket.sendto(result.encode(), clientAddress)
+        serverSocket.close()
+        break
+    except:
+        result = 'Houve um erro na execução dos comandos. Favor tentar novamente.'
+        print(result)
+        serverSocket.sendto(result.encode(), clientAddress)
